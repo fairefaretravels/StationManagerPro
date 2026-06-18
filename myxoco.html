@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XOCO — Live & On Demand</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --deep: #0e0e0e;
+    --surface: #141414;
+    --card: #1a1a1a;
+    --border: #2a2a2a;
+    --red: #e5000a;
+    --red-dim: #8a0006;
+    --white: #f0ece4;
+    --muted: #666;
+    --warm: #c8b89a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.35;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 56px;
+    background: linear-gradient(to bottom, rgba(8,8,8,0.98), rgba(8,8,8,0));
+    border-bottom: 1px solid rgba(229,0,10,0.15);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.15em;
+    color: var(--white);
+    text-decoration: none;
+    position: relative;
+  }
+
+  .nav-logo span {
+    color: var(--red);
+  }
+
+  .nav-logo::after {
+    content: '●';
+    font-size: 0.4rem;
+    color: var(--red);
+    position: absolute;
+    top: 8px;
+    right: -12px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--white); }
+
+  .nav-cta {
+    background: var(--red);
+    color: var(--white) !important;
+    padding: 0.4rem 1.2rem !important;
+    font-weight: 600 !important;
+    transition: background 0.2s !important;
+  }
+
+  .nav-cta:hover { background: #ff0010 !important; color: var(--white) !important; }
+
+  /* LIVE HERO */
+  .live-hero {
+    position: relative;
+    width: 100%;
+    padding-top: 56px;
+    background: var(--black);
+  }
+
+  .live-badge {
+    position: absolute;
+    top: 72px;
+    left: 2rem;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--red);
+    padding: 0.3rem 0.8rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+  }
+
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    animation: pulse 1.2s infinite;
+  }
+
+  .player-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    overflow: hidden;
+  }
+
+  .player-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  /* Offline state */
+  .player-offline {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: radial-gradient(ellipse at center, #1a0a0a 0%, #080808 70%);
+  }
+
+  .offline-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 12vw, 10rem);
+    letter-spacing: 0.2em;
+    color: rgba(240,236,228,0.06);
+    line-height: 1;
+    user-select: none;
+  }
+
+  .offline-text {
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .offline-line {
+    width: 60px;
+    height: 1px;
+    background: var(--red-dim);
+  }
+
+  /* Channel info bar */
+  .channel-bar {
+    background: var(--deep);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 0.8rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .channel-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .channel-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    color: var(--warm);
+  }
+
+  .channel-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .viewer-count {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .viewer-count::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--red);
+    display: inline-block;
+  }
+
+  /* SECTION HEADERS */
+  .section {
+    padding: 3rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-left: 3px solid var(--red);
+    padding-left: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.12em;
+    color: var(--white);
+  }
+
+  .section-sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* VOD GRID */
+  .vod-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  .vod-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s, border-color 0.25s;
+    position: relative;
+    group: true;
+  }
+
+  .vod-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--red-dim);
+  }
+
+  .vod-thumb {
+    aspect-ratio: 16/9;
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .vod-thumb-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.7) saturate(0.6);
+    transition: filter 0.3s;
+  }
+
+  .vod-card:hover .vod-thumb-bg {
+    filter: brightness(0.9) saturate(0.9);
+  }
+
+  .vod-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a1a1a, #0e0e0e);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: rgba(255,255,255,0.05);
+    letter-spacing: 0.2em;
+  }
+
+  .vod-play {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s;
+    background: rgba(229,0,10,0.2);
+  }
+
+  .vod-card:hover .vod-play { opacity: 1; }
+
+  .play-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .play-icon::after {
+    content: '';
+    border-left: 14px solid white;
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+    margin-left: 3px;
+  }
+
+  .vod-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--red);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+    font-weight: 600;
+  }
+
+  .vod-info {
+    padding: 0.8rem;
+  }
+
+  .vod-category {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 0.3rem;
+  }
+
+  .vod-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 0.3rem;
+  }
+
+  .vod-meta {
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  /* CATEGORIES ROW */
+  .cat-row {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+
+  .cat-pill {
+    padding: 0.35rem 1rem;
+    border: 1px solid var(--border);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s;
+    background: transparent;
+  }
+
+  .cat-pill:hover, .cat-pill.active {
+    border-color: var(--red);
+    color: var(--white);
+    background: rgba(229,0,10,0.08);
+  }
+
+  /* FEATURED BANNER */
+  .featured-banner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .featured-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--red), transparent);
+  }
+
+  .featured-tag {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 0.75rem;
+  }
+
+  .featured-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    letter-spacing: 0.08em;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .featured-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    background: var(--red);
+    color: var(--white);
+    padding: 0.7rem 2rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    text-decoration: none;
+    transition: background 0.2s;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary:hover { background: #ff0010; }
+
+  .btn-secondary {
+    display: inline-block;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.7rem 2rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    background: transparent;
+    margin-left: 1rem;
+  }
+
+  .btn-secondary:hover { border-color: var(--white); color: var(--white); }
+
+  .featured-visual {
+    aspect-ratio: 16/9;
+    background: linear-gradient(135deg, #1a0505, #0e0e0e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem;
+    color: rgba(229,0,10,0.15);
+    letter-spacing: 0.3em;
+    border: 1px solid var(--border);
+  }
+
+  /* SUBSCRIBE STRIP */
+  .subscribe-strip {
+    background: var(--red);
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .subscribe-text h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.12em;
+  }
+
+  .subscribe-text p {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-top: 0.2rem;
+  }
+
+  .subscribe-form {
+    display: flex;
+    gap: 0;
+  }
+
+  .subscribe-form input {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-right: none;
+    color: white;
+    padding: 0.7rem 1.2rem;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.85rem;
+    width: 260px;
+    outline: none;
+  }
+
+  .subscribe-form input::placeholder { color: rgba(255,255,255,0.4); }
+
+  .subscribe-form button {
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    padding: 0.7rem 1.5rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .subscribe-form button:hover { background: #111; }
+
+  /* FOOTER */
+  footer {
+    background: var(--deep);
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.2em;
+    color: rgba(240,236,228,0.3);
+  }
+
+  .footer-logo span { color: var(--red-dim); }
+
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .footer-links a {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--white); }
+
+  .footer-copy {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-up {
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  .fade-up-delay { animation-delay: 0.15s; opacity: 0; }
+  .fade-up-delay-2 { animation-delay: 0.3s; opacity: 0; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--red-dim); }
+
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .featured-banner { grid-template-columns: 1fr; }
+    .featured-visual { display: none; }
+    .subscribe-strip { flex-direction: column; align-items: flex-start; }
+    .subscribe-form input { width: 200px; }
+    footer { flex-direction: column; align-items: flex-start; }
+    .footer-links { flex-wrap: wrap; gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">XOC<span>O</span></a>
+  <ul class="nav-links">
+    <li><a href="#live">Live</a></li>
+    <li><a href="#vod">On Demand</a></li>
+    <li><a href="#schedule">Schedule</a></li>
+    <li><a href="#subscribe" class="nav-cta">Subscribe</a></li>
+  </ul>
+</nav>
+
+<!-- LIVE HERO -->
+<section class="live-hero" id="live">
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    LIVE NOW
+  </div>
+
+  <div class="player-wrapper">
+    <!-- REPLACE src WITH YOUR OWNCAST OR YOUTUBE EMBED URL -->
+    <!-- Example Owncast: <iframe src="http://YOUR-IP:8080/embed/video" allowfullscreen></iframe> -->
+    <!-- Example YouTube Live: <iframe src="https://www.youtube.com/embed/LIVE_VIDEO_ID?autoplay=1&controls=1&rel=0" allowfullscreen></iframe> -->
+
+    <div class="player-offline">
+      <div class="offline-logo">XOCO</div>
+      <div class="offline-line"></div>
+      <div class="offline-text">Off Air — Check Back Soon</div>
+    </div>
+  </div>
+
+  <div class="channel-bar">
+    <div class="channel-info">
+      <div class="channel-name">XOCO NETWORK</div>
+      <div class="channel-desc">Variety — Culture — Unfiltered</div>
+    </div>
+    <div class="viewer-count">247 watching</div>
+  </div>
+</section>
+
+<!-- FEATURED -->
+<div class="section">
+  <div class="featured-banner fade-up">
+    <div>
+      <div class="featured-tag">Featured This Week</div>
+      <div class="featured-title">The Midnight<br>Sessions</div>
+      <div class="featured-desc">Late night talk, underground music, and conversations that don't happen anywhere else. New episodes every Thursday.</div>
+      <button class="btn-primary">Watch Now</button>
+      <button class="btn-secondary">+ Watchlist</button>
+    </div>
+    <div class="featured-visual">XOCO</div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="cat-row fade-up fade-up-delay">
+    <button class="cat-pill active">All</button>
+    <button class="cat-pill">Music</button>
+    <button class="cat-pill">Talk</button>
+    <button class="cat-pill">Documentary</button>
+    <button class="cat-pill">Comedy</button>
+    <button class="cat-pill">Culture</button>
+    <button class="cat-pill">Sports</button>
+    <button class="cat-pill">PPV</button>
+  </div>
+
+  <!-- VOD SECTION -->
+  <div id="vod">
+    <div class="section-header fade-up fade-up-delay">
+      <div class="section-title">On Demand</div>
+      <div class="section-sub">Latest Uploads</div>
+    </div>
+
+    <div class="vod-grid fade-up fade-up-delay-2">
+
+      <div class="vod-card">
+        <div class="vod-thumb">
+          <div class="vod-thumb-placeholder">XOCO</div>
+          <div class="vod-play"><div class="play-icon"></div></div>
+          <div class="vod-badge">NEW</div>
+        </div>
+        <div class="vod-info">
+          <div class="vod-category">Talk</div>
+          <div class="vod-title">Midnight Sessions EP. 12</div>
+          <div class="vod-meta">48 min · Free</div>
+        </div>
+      </div>
+
+      <div class="vod-card">
+        <div class="vod-thumb">
+          <div class="vod-thumb-placeholder">XOCO</div>
+          <div class="vod-play"><div class="play-icon"></div></div>
+          <div class="vod-badge" style="background:#555">PPV</div>
+        </div>
+        <div class="vod-info">
+          <div class="vod-category">Music</div>
+          <div class="vod-title">Live at the Loft — Vol 3</div>
+          <div class="vod-meta">1h 22 min · $4.99</div>
+        </div>
+      </div>
+
+      <div class="vod-card">
+        <div class="vod-thumb">
+          <div class="vod-thumb-placeholder">XOCO</div>
+          <div class="vod-play"><div class="play-icon"></div></div>
+        </div>
+        <div class="vod-info">
+          <div class="vod-category">Documentary</div>
+          <div class="vod-title">Under the Radar</div>
+          <div class="vod-meta">55 min · Members</div>
+        </div>
+      </div>
+
+      <div class="vod-card">
+        <div class="vod-thumb">
+          <div class="vod-thumb-placeholder">XOCO</div>
+          <div class="vod-play"><div class="play-icon"></div></div>
+        </div>
+        <div class="vod-info">
+          <div class="vod-category">Comedy</div>
+          <div class="vod-title">No Filter — Stand Up</div>
+          <div class="vod-meta">38 min · Free</div>
+        </div>
+      </div>
+
+      <div class="vod-card">
+        <div class="vod-thumb">
+          <div class="vod-thumb-placeholder">XOCO</div>
+          <div class="vod-play"><div class="play-icon"></div></div>
+          <div class="vod-badge">NEW</div>
+        </div>
+        <div class="vod-info">
+          <div class="vod-category">Culture</div>
+          <div class="vod-title">Street Level — S2 E1</div>
+          <div class="vod-meta">42 min · Members</div>
+        </div>
+      </div>
+
+      <div class="vod-card">
+        <div class="vod-thumb">
+          <div class="vod-thumb-placeholder">XOCO</div>
+          <div class="vod-play"><div class="play-icon"></div></div>
+        </div>
+        <div class="vod-info">
+          <div class="vod-category">Music</div>
+          <div class="vod-title">The Session Tapes</div>
+          <div class="vod-meta">1h 05 min · Free</div>
+        </div>
+      </div>
+
+      <div class="vod-card">
+        <div class="vod-thumb">
+          <div class="vod-thumb-placeholder">XOCO</div>
+          <div class="vod-play"><div class="play-icon"></div></div>
+          <div class="vod-badge" style="background:#555">PPV</div>
+        </div>
+        <div class="vod-info">
+          <div class="vod-category">Sports</div>
+          <div class="vod-title">Main Event — Feb 14</div>
+          <div class="vod-meta">2h 10 min · $9.99</div>
+        </div>
+      </div>
+
+      <div class="vod-card">
+        <div class="vod-thumb">
+          <div class="vod-thumb-placeholder">XOCO</div>
+          <div class="vod-play"><div class="play-icon"></div></div>
+        </div>
+        <div class="vod-info">
+          <div class="vod-category">Talk</div>
+          <div class="vod-title">Raw Conversations — 08</div>
+          <div class="vod-meta">1h 12 min · Free</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- SUBSCRIBE STRIP -->
+<div class="subscribe-strip" id="subscribe">
+  <div class="subscribe-text">
+    <h3>Join XOCO Members</h3>
+    <p>Unlock full library, live replays, and exclusive content. Cancel anytime.</p>
+  </div>
+  <div class="subscribe-form">
+    <input type="email" placeholder="your@email.com">
+    <button>Get Access</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">XOC<span>O</span></div>
+  <ul class="footer-links">
+    <li><a href="#">About</a></li>
+    <li><a href="#">Schedule</a></li>
+    <li><a href="#">Members</a></li>
+    <li><a href="#">Contact</a></li>
+    <li><a href="#">Privacy</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 XOCO Network. All rights reserved.</div>
+</footer>
+
+<script>
+  // Category filter pills
+  document.querySelectorAll('.cat-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+    });
+  });
+
+  // Simulate viewer count fluctuation
+  const viewerEl = document.querySelector('.viewer-count');
+  let viewers = 247;
+  setInterval(() => {
+    viewers += Math.floor(Math.random() * 7) - 3;
+    viewers = Math.max(100, viewers);
+    viewerEl.textContent = viewers.toLocaleString() + ' watching';
+  }, 5000);
+
+  // To activate the live player, replace the player-offline div with:
+  // <iframe src="http://YOUR-IP:8080/embed/video" allowfullscreen allow="autoplay"></iframe>
+</script>
+
+</body>
+</html>

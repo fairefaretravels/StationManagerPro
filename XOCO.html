@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XOCO · Saneca TV</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:       #080808;
+  --surface:  #0f0f11;
+  --card:     #141416;
+  --border:   #1e1e24;
+  --border2:  #2a2a32;
+  --amber:    #E8A020;
+  --amber2:   #f5b840;
+  --amber-bg: #1a1205;
+  --slate:    #8899AA;
+  --muted:    #50505e;
+  --white:    #F2F0EA;
+  --red:      #E03030;
+  --green:    #28c76f;
+  --head:     'Space Grotesk', sans-serif;
+  --body:     'Inter', sans-serif;
+  --r:        8px;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--white); font-family: var(--body); line-height: 1.6; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+img { display: block; max-width: 100%; }
+
+/* ─── NAV ─── */
+nav {
+  position: sticky; top: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 58px;
+  background: rgba(8,8,8,.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: var(--head); font-weight: 800; font-size: 1.15rem; letter-spacing: .1em; text-transform: uppercase; }
+.nav-logo em { color: var(--amber); font-style: normal; }
+.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-links a { font-family: var(--head); font-size: .78rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--slate); transition: color .15s; }
+.nav-links a:hover { color: var(--white); }
+.nav-cta { font-family: var(--head); font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 7px 18px; border-radius: 5px; background: var(--amber); color: #080808; transition: background .15s; }
+.nav-cta:hover { background: var(--amber2); }
+.nav-live { display: flex; align-items: center; gap: 6px; font-family: var(--head); font-size: .72rem; font-weight: 700; letter-spacing: .12em; color: var(--red); }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.2} }
+
+/* ─── HERO ─── */
+.hero { display: grid; grid-template-columns: 1fr 380px; gap: 0; min-height: 520px; border-bottom: 1px solid var(--border); }
+.hero-player { position: relative; background: #000; }
+.hero-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+.hero-placeholder {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px;
+  background: #000;
+}
+.hero-placeholder .off-air { font-family: var(--head); font-size: .8rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 6px 16px; border-radius: 4px; }
+.hero-placeholder .tune-btn { font-family: var(--head); font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 10px 24px; border-radius: 6px; background: var(--amber); color: #080808; margin-top: 8px; transition: background .15s; }
+.hero-placeholder .tune-btn:hover { background: var(--amber2); }
+
+.hero-info { display: flex; flex-direction: column; justify-content: space-between; padding: 32px 28px; background: var(--surface); border-left: 1px solid var(--border); }
+.hero-eyebrow { font-family: var(--head); font-size: .68rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--amber); margin-bottom: 10px; }
+.hero-title { font-family: var(--head); font-size: 1.6rem; font-weight: 800; line-height: 1.2; letter-spacing: -.01em; margin-bottom: 10px; }
+.hero-sub { font-size: .88rem; color: var(--slate); line-height: 1.6; margin-bottom: 20px; }
+.hero-now { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; margin-bottom: 20px; }
+.hero-now-label { font-family: var(--head); font-size: .64rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.hero-now-name { font-family: var(--head); font-size: 1rem; font-weight: 700; color: var(--white); }
+.hero-now-type { font-family: var(--head); font-size: .72rem; color: var(--slate); margin-top: 2px; }
+.hero-actions { display: flex; gap: 10px; }
+.btn-primary { font-family: var(--head); font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 11px 22px; border-radius: 6px; background: var(--amber); color: #080808; transition: background .15s; }
+.btn-primary:hover { background: var(--amber2); }
+.btn-secondary { font-family: var(--head); font-size: .78rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: 11px 22px; border-radius: 6px; border: 1px solid var(--border2); color: var(--slate); transition: all .15s; }
+.btn-secondary:hover { border-color: var(--amber); color: var(--amber); }
+
+/* ─── SECTION LABELS ─── */
+.section { padding: 48px 32px; }
+.section-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 28px; }
+.section-head h2 { font-family: var(--head); font-size: 1.1rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.section-head .sec-sub { font-family: var(--head); font-size: .72rem; color: var(--muted); letter-spacing: .06em; }
+.divider { height: 1px; background: var(--border); margin: 0 32px; }
+
+/* ─── SCHEDULE GRID ─── */
+#schedule { background: var(--surface); }
+.sched-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+.sched-slot {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 12px 10px;
+  cursor: pointer; transition: all .18s;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.sched-slot:hover { border-color: var(--amber); background: var(--amber-bg); }
+.sched-slot.active { border-color: var(--amber); background: var(--amber-bg); }
+.sched-slot.active .slot-time { color: var(--amber); }
+.sched-slot .slot-time { font-family: var(--head); font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.sched-slot .slot-name { font-family: var(--head); font-size: .78rem; font-weight: 700; color: var(--white); line-height: 1.2; }
+.sched-slot .slot-ch { font-family: var(--head); font-size: .64rem; color: var(--slate); margin-top: 2px; }
+
+/* current-hour glow */
+.sched-slot.now-slot { border-color: var(--red) !important; }
+.sched-slot.now-slot .slot-time { color: var(--red) !important; }
+
+/* ─── INLINE PLAYER MODAL ─── */
+.player-modal {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,.88); align-items: center; justify-content: center;
+  padding: 20px;
+}
+.player-modal.open { display: flex; }
+.player-box {
+  width: 100%; max-width: 860px; background: var(--surface);
+  border: 1px solid var(--border2); border-radius: 12px; overflow: hidden;
+}
+.player-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+}
+.player-bar-info { display: flex; flex-direction: column; gap: 2px; }
+.player-bar-info strong { font-family: var(--head); font-size: .9rem; font-weight: 700; }
+.player-bar-info span { font-family: var(--head); font-size: .7rem; color: var(--slate); }
+.player-close { font-family: var(--head); font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 6px 14px; border: 1px solid var(--border); border-radius: 5px; transition: all .15s; }
+.player-close:hover { border-color: var(--amber); color: var(--amber); }
+.player-stage { position: relative; aspect-ratio: 16/9; background: #000; }
+.player-stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+/* audio embed */
+.player-stage .audio-embed { position: absolute; inset: 0; border: none; width: 100%; height: 100%; }
+
+/* ─── VOD GRID ─── */
+#vod { background: var(--bg); }
+.vod-filters { display: flex; gap: 6px; margin-bottom: 24px; flex-wrap: wrap; }
+.vod-filter { font-family: var(--head); font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 6px 14px; border-radius: 5px; border: 1px solid var(--border); color: var(--slate); cursor: pointer; transition: all .15s; }
+.vod-filter:hover, .vod-filter.active { border-color: var(--amber); color: var(--amber); background: var(--amber-bg); }
+.vod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.vod-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; cursor: pointer; transition: all .2s; }
+.vod-card:hover { border-color: var(--amber); transform: translateY(-3px); }
+.vod-thumb { aspect-ratio: 16/9; background: #0a0a10; position: relative; overflow: hidden; }
+.vod-thumb iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; pointer-events: none; }
+.vod-badges { position: absolute; top: 8px; left: 8px; display: flex; gap: 4px; }
+.badge { font-family: var(--head); font-size: .6rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; padding: 3px 7px; border-radius: 3px; }
+.badge-ppv { background: var(--amber); color: #080808; }
+.badge-new { background: var(--red); color: #fff; }
+.badge-mem { background: #1a1a2e; color: #8899cc; border: 1px solid #2a2a4e; }
+.vod-body { padding: 12px 14px; }
+.vod-cat { font-family: var(--head); font-size: .64rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--amber); margin-bottom: 4px; }
+.vod-title { font-family: var(--head); font-size: .88rem; font-weight: 700; line-height: 1.25; margin-bottom: 6px; }
+.vod-meta { font-family: var(--head); font-size: .68rem; color: var(--muted); }
+.vod-price { font-family: var(--head); font-size: .75rem; font-weight: 700; color: var(--amber); margin-top: 6px; }
+
+/* pay wall modal */
+.pay-modal {
+  display: none; position: fixed; inset: 0; z-index: 600;
+  background: rgba(0,0,0,.92); align-items: center; justify-content: center; padding: 20px;
+}
+.pay-modal.open { display: flex; }
+.pay-box { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; padding: 32px 28px; text-align: center; }
+.pay-box h3 { font-family: var(--head); font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; }
+.pay-box p { font-size: .86rem; color: var(--slate); margin-bottom: 24px; line-height: 1.6; }
+.pay-price { font-family: var(--head); font-size: 2rem; font-weight: 800; color: var(--amber); margin-bottom: 4px; }
+.pay-price small { font-size: 1rem; color: var(--slate); }
+.pay-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+.pay-actions .btn-primary { width: 100%; text-align: center; padding: 13px; font-size: .82rem; }
+.pay-dismiss { font-family: var(--head); font-size: .72rem; color: var(--muted); cursor: pointer; margin-top: 6px; transition: color .15s; }
+.pay-dismiss:hover { color: var(--white); }
+
+/* ─── MEMBERSHIP BANNER ─── */
+.member-banner {
+  margin: 0 32px 48px; padding: 40px 36px;
+  background: linear-gradient(110deg, #0f0d07 0%, #1a1205 50%, #0f0d07 100%);
+  border: 1px solid var(--amber-dim, #7a5210); border-radius: 12px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+}
+.member-banner h3 { font-family: var(--head); font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+.member-banner p { font-size: .86rem; color: var(--slate); max-width: 480px; }
+.member-banner .btn-primary { white-space: nowrap; padding: 13px 28px; font-size: .8rem; }
+
+/* ─── FOOTER ─── */
+footer { border-top: 1px solid var(--border); padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--surface); }
+.footer-logo { font-family: var(--head); font-weight: 800; font-size: .9rem; letter-spacing: .1em; text-transform: uppercase; }
+.footer-logo em { color: var(--amber); font-style: normal; }
+.footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+.footer-links a { font-family: var(--head); font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); transition: color .15s; }
+.footer-links a:hover { color: var(--slate); }
+footer small { font-size: .7rem; color: var(--muted); font-family: var(--head); letter-spacing: .05em; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-player { min-height: 240px; position: relative; }
+  .hero-info { border-left: none; border-top: 1px solid var(--border); }
+  .sched-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 600px) {
+  nav { padding: 0 16px; }
+  .nav-links { display: none; }
+  .section { padding: 32px 16px; }
+  .divider { margin: 0 16px; }
+  .sched-grid { grid-template-columns: repeat(3, 1fr); }
+  .member-banner { margin: 0 16px 32px; padding: 28px 20px; }
+  footer { padding: 20px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="nav-logo"><em>XOCO</em> · Saneca TV</div>
+  <div class="nav-links">
+    <a href="#live">Live</a>
+    <a href="#schedule">Schedule</a>
+    <a href="#vod">On Demand</a>
+    <a href="#members">Members</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="nav-live"><span class="live-dot"></span>Live</div>
+    <button class="nav-cta" onclick="document.getElementById('members').scrollIntoView({behavior:'smooth'})">Join</button>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero" id="live">
+  <div class="hero-player" id="heroPlayerWrap">
+    <!-- Swapped dynamically by JS; default shows placeholder -->
+    <div class="hero-placeholder" id="heroPlaceholder">
+      <div class="off-air">Select a time slot to tune in</div>
+      <button class="tune-btn" onclick="tuneHero()">▶ Tune to Live Channel</button>
+    </div>
+    <iframe id="heroFrame" style="display:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
+  </div>
+  <div class="hero-info">
+    <div>
+      <div class="hero-eyebrow">Now Broadcasting</div>
+      <div class="hero-title">Culture.<br>Street.<br>Sound.</div>
+      <div class="hero-sub">XOCO is Saneca TV's broadcast network — 24-hour scheduled programming across music, film, fashion, and the culture that moves it all.</div>
+    </div>
+    <div class="hero-now" id="heroNow">
+      <div class="hero-now-label">On Air Now</div>
+      <div class="hero-now-name" id="heroNowName">—</div>
+      <div class="hero-now-type" id="heroNowType">—</div>
+    </div>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="tuneHero()">▶ Watch Live</button>
+      <button class="btn-secondary" onclick="document.getElementById('schedule').scrollIntoView({behavior:'smooth'})">Full Schedule</button>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SCHEDULE ─── -->
+<div class="divider"></div>
+<section class="section" id="schedule">
+  <div class="section-head">
+    <h2>24-Hour Schedule</h2>
+    <span class="sec-sub">Eastern Time · Tap any slot to watch</span>
+  </div>
+  <div class="sched-grid" id="schedGrid"></div>
+</section>
+
+<!-- ─── VOD ─── -->
+<div class="divider"></div>
+<section class="section" id="vod">
+  <div class="section-head">
+    <h2>On Demand</h2>
+    <span class="sec-sub">Exclusive paid content</span>
+  </div>
+  <div class="vod-filters" id="vodFilters"></div>
+  <div class="vod-grid" id="vodGrid"></div>
+</section>
+
+<!-- ─── MEMBERSHIP ─── -->
+<div class="member-banner" id="members">
+  <div>
+    <h3>Join XOCO Members</h3>
+    <p>Unlock the full On Demand library, live replays, and exclusive drops from Saneca TV. One price. Everything included.</p>
+  </div>
+  <button class="btn-primary">Get Access — $7.99/mo</button>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-logo"><em>XOCO</em> · Saneca TV</div>
+  <div class="footer-links">
+    <a href="#">About</a>
+    <a href="#schedule">Schedule</a>
+    <a href="#members">Members</a>
+    <a href="https://kick.com/STVNETWORK" target="_blank">Kick</a>
+    <a href="https://www.youtube.com/@STVRADIOMELTDOWN" target="_blank">YouTube</a>
+    <a href="https://www.tiktok.com/@sanecatv" target="_blank">TikTok</a>
+  </div>
+  <small>© 2026 Saneca TV · G4E Movement Studio · Lithonia, GA</small>
+</footer>
+
+<!-- ─── INLINE PLAYER MODAL ─── -->
+<div class="player-modal" id="playerModal">
+  <div class="player-box">
+    <div class="player-bar">
+      <div class="player-bar-info">
+        <strong id="modalTitle">—</strong>
+        <span id="modalSub">—</span>
+      </div>
+      <button class="player-close" onclick="closePlayer()">✕ Close</button>
+    </div>
+    <div class="player-stage" id="modalStage">
+      <iframe id="modalFrame" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- ─── PAYWALL MODAL ─── -->
+<div class="pay-modal" id="payModal">
+  <div class="pay-box">
+    <h3 id="payTitle">Exclusive Content</h3>
+    <div class="pay-price" id="payPrice">$4.99 <small>one time</small></div>
+    <p id="payDesc">Purchase to watch this title on XOCO.</p>
+    <div class="pay-actions">
+      <button class="btn-primary">Purchase & Watch</button>
+    </div>
+    <div class="pay-dismiss" onclick="closePaywall()">Maybe later</div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════════
+
+// 24-hour schedule — each slot has a name, channel type, and source
+// kind: 'player' = one of your STV player iframes
+//       'vimeo'  = single Vimeo ID
+const SCHEDULE = [
+  /* 12am */ { name: 'Love & Co.',      type: 'Soul · Night Cruise',   kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-loveandcompany/' },
+  /* 1am  */ { name: 'Love & Co.',      type: 'Soul · Night Cruise',   kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-loveandcompany/' },
+  /* 2am  */ { name: 'Love & Co.',      type: 'Soul · Night Cruise',   kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-loveandcompany/' },
+  /* 3am  */ { name: 'Love & Co.',      type: 'Soul · Night Cruise',   kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-loveandcompany/' },
+  /* 4am  */ { name: 'Love & Co.',      type: 'Soul · Night Cruise',   kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-loveandcompany/' },
+  /* 5am  */ { name: 'STV Gold',        type: 'Elevated Sound',        kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-Gold/' },
+  /* 6am  */ { name: 'STV Gold',        type: 'Elevated Sound',        kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-Gold/' },
+  /* 7am  */ { name: 'STV Gold',        type: 'Elevated Sound',        kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-Gold/' },
+  /* 8am  */ { name: 'STV Fit',         type: 'Movement · Energy',     kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-fit/' },
+  /* 9am  */ { name: 'STV Fit',         type: 'Movement · Energy',     kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-fit/' },
+  /* 10am */ { name: 'Film & EDU',      type: 'Video · Vimeo',         kind: 'vimeo',  src: '1201972455' },
+  /* 11am */ { name: 'Film & EDU',      type: 'Video · Vimeo',         kind: 'vimeo',  src: '1201973030' },
+  /* 12pm */ { name: 'STV Red',         type: 'Hip-Hop · R&B',         kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown/' },
+  /* 1pm  */ { name: 'STV Red',         type: 'Hip-Hop · R&B',         kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown/' },
+  /* 2pm  */ { name: 'Fashion News',    type: 'Video · Vimeo',         kind: 'vimeo',  src: '1201452576' },
+  /* 3pm  */ { name: 'Fashion News',    type: 'Video · Vimeo',         kind: 'vimeo',  src: '1201185045' },
+  /* 4pm  */ { name: 'STV Fit',         type: 'Movement · Energy',     kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-fit/' },
+  /* 5pm  */ { name: 'STV Fit',         type: 'Movement · Energy',     kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-fit/' },
+  /* 6pm  */ { name: 'STV Red',         type: 'Hip-Hop · R&B',         kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown/' },
+  /* 7pm  */ { name: 'STV Red',         type: 'Hip-Hop · R&B',         kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown/' },
+  /* 8pm  */ { name: 'Film & EDU',      type: 'Video · Vimeo',         kind: 'vimeo',  src: '1201973029' },
+  /* 9pm  */ { name: 'Fashion News',    type: 'Video · Vimeo',         kind: 'vimeo',  src: '1201452576' },
+  /* 10pm */ { name: 'STV Gold',        type: 'Elevated Sound',        kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-Gold/' },
+  /* 11pm */ { name: 'Love & Co.',      type: 'Soul · Night Cruise',   kind: 'player', src: 'https://fairefaretravels.github.io/stvradiomeltdown-loveandcompany/' },
+];
+
+// VOD — paid only. Add your real Vimeo IDs + prices here.
+const VOD = [
+  { id: '1201972455', title: 'STV Feature Vol. 1',     cat: 'Film',    runtime: '42 min', price: '$4.99',  badge: 'ppv',  isNew: false },
+  { id: '1201973030', title: 'STV Feature Vol. 2',     cat: 'Film',    runtime: '38 min', price: '$4.99',  badge: 'ppv',  isNew: true  },
+  { id: '1201973029', title: 'STV Feature Vol. 3',     cat: 'Film',    runtime: '55 min', price: '$4.99',  badge: 'ppv',  isNew: false },
+  { id: '1201452576', title: 'Fashion Report — Drop 1',cat: 'Fashion', runtime: '24 min', price: '$2.99',  badge: 'ppv',  isNew: true  },
+  { id: '1201185045', title: 'Fashion Report — Drop 2',cat: 'Fashion', runtime: '28 min', price: '$2.99',  badge: 'mem',  isNew: false },
+  // Add more: { id: 'VIMEO_ID', title: '...', cat: '...', runtime: '...', price: '$X.XX', badge: 'ppv'|'mem'|'new', isNew: true|false }
+];
+
+const VOD_CATS = ['All', ...new Set(VOD.map(v => v.cat))];
+
+// ══════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════
+function etHour() {
+  return new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })).getHours();
+}
+function fmtHour(h) {
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  return `${(h % 12) || 12}:00 ${ampm}`;
+}
+
+// ══════════════════════════════════════════════════════
+//  SCHEDULE GRID
+// ══════════════════════════════════════════════════════
+function buildSchedule() {
+  const grid = document.getElementById('schedGrid');
+  const cur  = etHour();
+  grid.innerHTML = '';
+  SCHEDULE.forEach((slot, h) => {
+    const div = document.createElement('div');
+    div.className = 'sched-slot' + (h === cur ? ' now-slot' : '');
+    div.innerHTML = `
+      <span class="slot-time">${fmtHour(h)}${h === cur ? ' · NOW' : ''}</span>
+      <span class="slot-name">${slot.name}</span>
+      <span class="slot-ch">${slot.type}</span>`;
+    div.onclick = () => openPlayer(slot, `${slot.name} · ${fmtHour(h)}`);
+    grid.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+//  HERO
+// ══════════════════════════════════════════════════════
+function tuneHero() {
+  const h = etHour();
+  const slot = SCHEDULE[h];
+  const frame = document.getElementById('heroFrame');
+  const placeholder = document.getElementById('heroPlaceholder');
+
+  if (slot.kind === 'vimeo') {
+    frame.src = `https://player.vimeo.com/video/${slot.src}?autoplay=1&title=0&byline=0&portrait=0&color=E8A020`;
+  } else {
+    frame.src = slot.src;
+  }
+  placeholder.style.display = 'none';
+  frame.style.display = 'block';
+}
+
+function updateHeroNow() {
+  const h    = etHour();
+  const slot = SCHEDULE[h];
+  document.getElementById('heroNowName').textContent = slot.name;
+  document.getElementById('heroNowType').textContent = slot.type + ' · ' + fmtHour(h);
+}
+
+// ══════════════════════════════════════════════════════
+//  INLINE PLAYER MODAL
+// ══════════════════════════════════════════════════════
+function openPlayer(slot, label) {
+  document.getElementById('modalTitle').textContent = slot.name;
+  document.getElementById('modalSub').textContent   = label;
+  const src = slot.kind === 'vimeo'
+    ? `https://player.vimeo.com/video/${slot.src}?autoplay=1&title=0&byline=0&portrait=0&color=E8A020`
+    : slot.src;
+  document.getElementById('modalFrame').src = src;
+  document.getElementById('playerModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePlayer() {
+  document.getElementById('modalFrame').src = '';
+  document.getElementById('playerModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// close on backdrop click
+document.getElementById('playerModal').addEventListener('click', function(e) {
+  if (e.target === this) closePlayer();
+});
+
+// ══════════════════════════════════════════════════════
+//  VOD
+// ══════════════════════════════════════════════════════
+let activeFilter = 'All';
+
+function buildVodFilters() {
+  const wrap = document.getElementById('vodFilters');
+  VOD_CATS.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'vod-filter' + (cat === activeFilter ? ' active' : '');
+    btn.textContent = cat;
+    btn.onclick = () => { activeFilter = cat; buildVodFilters(); buildVodGrid(); };
+    wrap.appendChild(btn);
+  });
+}
+
+function buildVodGrid() {
+  const grid = document.getElementById('vodGrid');
+  grid.innerHTML = '';
+  const items = activeFilter === 'All' ? VOD : VOD.filter(v => v.cat === activeFilter);
+  items.forEach(v => {
+    const card = document.createElement('div');
+    card.className = 'vod-card';
+    const badgeHtml = v.badge === 'ppv'
+      ? `<span class="badge badge-ppv">PPV</span>`
+      : v.badge === 'mem'
+      ? `<span class="badge badge-mem">Members</span>`
+      : '';
+    const newBadge = v.isNew ? `<span class="badge badge-new">New</span>` : '';
+    card.innerHTML = `
+      <div class="vod-thumb">
+        <iframe src="https://player.vimeo.com/video/${v.id}?background=1&muted=1&loop=1&title=0&byline=0&portrait=0" frameborder="0"></iframe>
+        <div class="vod-badges">${newBadge}${badgeHtml}</div>
+      </div>
+      <div class="vod-body">
+        <div class="vod-cat">${v.cat}</div>
+        <div class="vod-title">${v.title}</div>
+        <div class="vod-meta">${v.runtime}</div>
+        <div class="vod-price">${v.price}</div>
+      </div>`;
+    card.onclick = () => openPaywall(v);
+    grid.appendChild(card);
+  });
+}
+
+// ── PAYWALL
+function openPaywall(v) {
+  document.getElementById('payTitle').textContent = v.title;
+  document.getElementById('payPrice').innerHTML   = `${v.price} <small>one time</small>`;
+  document.getElementById('payDesc').textContent  = `Purchase to unlock "${v.title}" on XOCO · Saneca TV.`;
+  document.getElementById('payModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePaywall() {
+  document.getElementById('payModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('payModal').addEventListener('click', function(e) {
+  if (e.target === this) closePaywall();
+});
+
+// ── keyboard close
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closePlayer(); closePaywall(); }
+});
+
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
+buildSchedule();
+buildVodFilters();
+buildVodGrid();
+updateHeroNow();
+// refresh on new hour
+setInterval(() => {
+  const h = etHour();
+  if (h !== window._lastHour) { window._lastHour = h; buildSchedule(); updateHeroNow(); }
+}, 30000);
+window._lastHour = etHour();
+</script>
+</body>
+</html>
